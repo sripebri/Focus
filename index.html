@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset 21 Hari — Florr</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#170a10;
+    --ink-2:#1f0f16;
+    --panel:#271420;
+    --panel-2:#331a28;
+    --line: rgba(247,231,228,0.09);
+    --cream:#f8ece8;
+    --mauve:#cba3ab;
+    --mauve-dim:#94737b;
+    --wine:#5c1f30;
+    --rose:#e8899f;
+    --blush:#f4bfcd;
+    --gold:#d9a76a;
+    --grad: linear-gradient(120deg, var(--wine) 0%, var(--rose) 50%, var(--blush) 100%);
+    --grad-soft: linear-gradient(120deg, rgba(92,31,48,0.3) 0%, rgba(232,137,159,0.28) 50%, rgba(244,191,205,0.28) 100%);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--ink);color:var(--cream);font-family:'Inter',-apple-system,sans-serif;}
+  body{min-height:100vh;padding:32px 20px 80px;}
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:10px; display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:"";width:16px;height:1px;background:var(--gold);display:inline-block;}
+
+  h1{
+    font-family:'Fraunces',serif; font-weight:600; font-size:clamp(30px,5vw,46px);
+    margin:0 0 6px; line-height:1.05;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .subtitle{color:var(--mauve); font-size:14.5px; max-width:560px; line-height:1.5; margin-bottom:28px;}
+
+  .stats-row{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:28px;
+  }
+  .stat-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px;
+  }
+  .stat-card .num{font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:var(--cream);}
+  .stat-card .lbl{font-size:11.5px; color:var(--mauve-dim); margin-top:2px; letter-spacing:0.02em;}
+
+  .weeks{display:flex; gap:8px; margin-bottom:14px;}
+  .week-tab{
+    flex:1; text-align:center; padding:10px; border-radius:12px; cursor:pointer;
+    background:var(--panel); border:1px solid var(--line); font-size:13px; color:var(--mauve);
+    transition:all .15s ease;
+  }
+  .week-tab.active{ background:var(--grad-soft); border-color:rgba(234,169,111,0.4); color:var(--cream); font-weight:600;}
+
+  .day-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:26px;}
+  .day-dot{
+    aspect-ratio:1; border-radius:12px; border:1px solid var(--line); background:var(--panel);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;
+    position:relative; transition:transform .12s ease;
+  }
+  .day-dot:hover{transform:translateY(-2px);}
+  .day-dot.active{border-color:var(--gold); box-shadow:0 0 0 1px var(--gold);}
+  .day-dot .dnum{font-family:'Fraunces',serif; font-size:15px; font-weight:600;}
+  .day-dot .dpct{font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--mauve-dim); margin-top:1px;}
+  .ring{position:absolute; inset:0; border-radius:12px; padding:2px; -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude;}
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:22px 24px; margin-bottom:20px;
+  }
+  .panel-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; flex-wrap:wrap; gap:8px;}
+  .panel-title{font-family:'Fraunces',serif; font-size:19px; font-weight:600;}
+  .panel-sub{font-size:12px; color:var(--mauve-dim); font-family:'JetBrains Mono',monospace;}
+
+  .schedule-row{
+    display:grid; grid-template-columns:76px 1fr 30px 28px; gap:10px; align-items:center;
+    padding:7px 0; border-bottom:1px solid var(--line);
+  }
+  .schedule-row:last-child{border-bottom:none;}
+  input[type="time"], input.act-input, textarea, input.text-input, input.num-input{
+    background:var(--ink-2); border:1px solid var(--line); color:var(--cream); border-radius:8px;
+    padding:7px 9px; font-family:'Inter',sans-serif; font-size:13.5px; width:100%;
+  }
+  input.time-input{font-family:'JetBrains Mono',monospace; font-size:12.5px; padding:7px 6px; text-align:center;}
+  input[type="checkbox"]{width:17px; height:17px; accent-color:var(--rose); cursor:pointer;}
+  .del-btn{
+    background:none; border:none; color:var(--mauve-dim); cursor:pointer; font-size:15px; opacity:.6;
+  }
+  .del-btn:hover{opacity:1; color:var(--rose);}
+  .add-row-btn{
+    margin-top:10px; background:var(--grad-soft); border:1px dashed rgba(234,169,111,0.4); color:var(--gold);
+    border-radius:10px; padding:8px 14px; font-size:12.5px; cursor:pointer; font-family:'JetBrains Mono',monospace;
+  }
+  .add-row-btn:hover{border-color:var(--gold);}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr;}}
+
+  .tracker-item{margin-bottom:16px;}
+  .tracker-item:last-child{margin-bottom:0;}
+  .tracker-label{
+    display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:600; margin-bottom:8px;
+  }
+  .tracker-label .ico{font-size:15px;}
+  .row-inline{display:flex; gap:8px; align-items:center;}
+  .row-inline input.num-input{width:70px; flex:none;}
+
+  .fin-row{display:grid; grid-template-columns:1fr 90px 90px 28px; gap:8px; align-items:center; padding:6px 0; border-bottom:1px solid var(--line);}
+  .fin-row:last-child{border-bottom:none;}
+  select.type-select{background:var(--ink-2); border:1px solid var(--line); color:var(--cream); border-radius:8px; padding:7px; font-size:12.5px;}
+  .fin-total{margin-top:10px; padding-top:10px; border-top:1px solid var(--line); display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:12.5px;}
+  .fin-total .pos{color:#8fd6a8;} .fin-total .neg{color:#e88f8f;}
+
+  .badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:3px 9px;
+    border-radius:20px; background:var(--grad-soft); color:var(--gold); border:1px solid rgba(234,169,111,0.35);
+  }
+  .reward-box{
+    margin-top:6px; padding:12px 14px; border-radius:12px; background:var(--ink-2); border:1px solid var(--line);
+    font-size:13px; color:var(--mauve);
+  }
+  .reward-box.eligible{border-color:rgba(234,169,111,0.5); background:var(--grad-soft); color:var(--cream);}
+
+  .save-indicator{
+    position:fixed; bottom:18px; right:18px; font-family:'JetBrains Mono',monospace; font-size:11px;
+    color:var(--mauve-dim); opacity:0; transition:opacity .3s ease; background:var(--panel);
+    padding:6px 12px; border-radius:20px; border:1px solid var(--line);
+  }
+  .save-indicator.show{opacity:1;}
+
+  .reset-link{
+    font-size:11.5px; color:var(--mauve-dim); text-decoration:underline; cursor:pointer; float:right; margin-top:-40px;
+  }
+  textarea{resize:vertical; min-height:44px; font-family:'Inter',sans-serif;}
+  ::placeholder{color:var(--mauve-dim); opacity:.7;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="eyebrow">SRIBYTE · Personal Reset</div>
+  <h1>Reset 21 Hari</h1>
+  <div class="subtitle">Fase fokus OTK — jadwal, olahraga, vocab, latihan soal, freelance, dan keuangan dalam satu tempat. Semua bisa diedit langsung, nggak perlu ke mana-mana.</div>
+
+  <div class="stats-row" id="statsRow"></div>
+
+  <div class="weeks" id="weekTabs"></div>
+  <div class="day-grid" id="dayGrid"></div>
+
+  <div id="dayPanelContainer"></div>
+
+  <div style="text-align:center; margin-top:30px;">
+    <span class="reset-link" id="resetLink" style="float:none;">Reset semua data</span>
+  </div>
+</div>
+<div class="save-indicator" id="saveIndicator">tersimpan</div>
+
+<script>
+const STORAGE_KEY = 'reset21-data-v1';
+const TOTAL_DAYS = 21;
+let data = null;
+let selectedDay = 1;
+let saveTimer = null;
+
+function defaultSchedule(){
+  return [
+    {time:"05:00", act:"Bangun & Sholat Subuh"},
+    {time:"05:15", act:"Olahraga"},
+    {time:"05:45", act:"Mandi & siap-siap"},
+    {time:"06:15", act:"Hafalan Vocab Pagi"},
+    {time:"06:30", act:"Sarapan"},
+    {time:"07:00", act:"Blok Fokus Utama: OTK"},
+    {time:"12:00", act:"Istirahat & Sholat Dzuhur"},
+    {time:"13:00", act:"Blok Fokus Kedua: OTK / Kampus"},
+    {time:"16:00", act:"Sholat Ashar"},
+    {time:"16:30", act:"Blok Fokus Ringan: Freelance / Konten"},
+    {time:"18:00", act:"Sholat Maghrib & Makan Malam"},
+    {time:"19:30", act:"Blok Fokus Malam: English"},
+    {time:"21:00", act:"Sholat Isya"},
+    {time:"21:30", act:"Hafalan Vocab Malam"},
+    {time:"21:45", act:"Waktu Santai / Reward Film"},
+    {time:"22:30", act:"Wind Down"},
+    {time:"23:00", act:"Tidur"},
+  ].map((s,i)=>({id:'s'+i, time:s.time, act:s.act, done:false}));
+}
+
+function initData(){
+  const days = [];
+  for(let i=1;i<=TOTAL_DAYS;i++){
+    days.push({
+      index:i,
+      schedule: defaultSchedule(),
+      trackers:{
+        olahraga:{done:false},
+        vocabPagi:{done:false, jumlah:0},
+        vocabMalam:{done:false, jumlah:0},
+        latihanSoal:{jumlah:0, catatan:""},
+        freelance:{done:false, catatan:""},
+        filmReward:{taken:false}
+      },
+      finance: []
+    });
+  }
+  return {startDate: new Date().toISOString().slice(0,10), days};
+}
+
+async function loadData(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, false);
+    if(res && res.value){ data = JSON.parse(res.value); return; }
+  }catch(e){ /* not found */ }
+  data = initData();
+  await persist();
+}
+
+async function persist(){
+  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(data), false); }catch(e){ console.error('save failed', e); }
+}
+
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    await persist();
+    const ind = document.getElementById('saveIndicator');
+    ind.classList.add('show');
+    setTimeout(()=>ind.classList.remove('show'), 900);
+  }, 500);
+}
+
+function dayCompletion(day){
+  const total = day.schedule.length + 5;
+  let done = day.schedule.filter(s=>s.done).length;
+  if(day.trackers.olahraga.done) done++;
+  if(day.trackers.vocabPagi.done) done++;
+  if(day.trackers.vocabMalam.done) done++;
+  if(day.trackers.latihanSoal.jumlah>0) done++;
+  if(day.trackers.freelance.done) done++;
+  return Math.round((done/total)*100);
+}
+
+function computeStreak(){
+  let streak = 0;
+  for(let i=data.days.length-1;i>=0;i--){
+    if(dayCompletion(data.days[i])>=70) streak++; else break;
+  }
+  return streak;
+}
+
+function computeFinanceTotals(){
+  let income=0, expense=0;
+  data.days.forEach(d=> d.finance.forEach(f=>{
+    if(f.type==='in') income += Number(f.amount)||0; else expense += Number(f.amount)||0;
+  }));
+  return {income, expense, net: income-expense};
+}
+
+function fmtRupiah(n){
+  return 'Rp' + Math.round(n).toLocaleString('id-ID');
+}
+
+function dateForDay(idx){
+  const d = new Date(data.startDate);
+  d.setDate(d.getDate() + (idx-1));
+  return d;
+}
+
+function isWeekendRewardDay(idx){
+  const dow = dateForDay(idx).getDay(); // 5=Fri, 6=Sat
+  return dow===5 || dow===6;
+}
+
+function renderStats(){
+  const streak = computeStreak();
+  const fin = computeFinanceTotals();
+  const avg = Math.round(data.days.reduce((a,d)=>a+dayCompletion(d),0)/data.days.length);
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="num">${streak}<span style="font-size:14px;color:var(--mauve-dim);">/21</span></div><div class="lbl">Streak hari (≥70%)</div></div>
+    <div class="stat-card"><div class="num">${avg}%</div><div class="lbl">Rata-rata penyelesaian</div></div>
+    <div class="stat-card"><div class="num" style="color:#8fd6a8;">${fmtRupiah(fin.income)}</div><div class="lbl">Total pemasukan</div></div>
+    <div class="stat-card"><div class="num" style="color:#e88f8f;">${fmtRupiah(fin.expense)}</div><div class="lbl">Total pengeluaran</div></div>
+  `;
+}
+
+function renderWeekTabs(){
+  const weeks = [[1,7],[8,14],[15,21]];
+  const currentWeek = Math.ceil(selectedDay/7);
+  document.getElementById('weekTabs').innerHTML = weeks.map((w,i)=>`
+    <div class="week-tab ${currentWeek===i+1?'active':''}" data-week="${i+1}">Minggu ${i+1} <span style="opacity:.6">(Hari ${w[0]}–${w[1]})</span></div>
+  `).join('');
+}
+
+function renderDayGrid(){
+  const week = Math.ceil(selectedDay/7);
+  const start = (week-1)*7+1, end = Math.min(week*7, TOTAL_DAYS);
+  let html = '';
+  for(let i=start;i<=end;i++){
+    const day = data.days[i-1];
+    const pct = dayCompletion(day);
+    html += `<div class="day-dot ${i===selectedDay?'active':''}" data-day="${i}">
+      <div class="dnum">${i}</div>
+      <div class="dpct">${pct}%</div>
+    </div>`;
+  }
+  document.getElementById('dayGrid').innerHTML = html;
+}
+
+function renderDayPanel(){
+  const day = data.days[selectedDay-1];
+  const dateStr = dateForDay(selectedDay).toLocaleDateString('id-ID',{weekday:'long', day:'numeric', month:'long'});
+  const weekendBadge = isWeekendRewardDay(selectedDay) ? `<span class="badge">🎬 Hari reward mingguan</span>` : '';
+
+  const scheduleRows = day.schedule.map(s=>`
+    <div class="schedule-row" data-id="${s.id}">
+      <input class="time-input" data-field="time" type="time" value="${s.time}">
+      <input class="act-input" data-field="act" type="text" value="${s.act.replace(/"/g,'&quot;')}" placeholder="Kegiatan...">
+      <input type="checkbox" data-field="done" ${s.done?'checked':''}>
+      <button class="del-btn" data-action="del-schedule">✕</button>
+    </div>
+  `).join('');
+
+  const financeRows = day.finance.map((f,idx)=>`
+    <div class="fin-row" data-idx="${idx}">
+      <input class="text-input" data-field="desc" type="text" value="${(f.desc||'').replace(/"/g,'&quot;')}" placeholder="Deskripsi...">
+      <select class="type-select" data-field="type">
+        <option value="in" ${f.type==='in'?'selected':''}>Masuk</option>
+        <option value="out" ${f.type==='out'?'selected':''}>Keluar</option>
+      </select>
+      <input class="num-input" data-field="amount" type="number" value="${f.amount||0}" placeholder="0">
+      <button class="del-btn" data-action="del-finance">✕</button>
+    </div>
+  `).join('');
+
+  const finTotals = day.finance.reduce((acc,f)=>{ if(f.type==='in') acc.in+=Number(f.amount)||0; else acc.out+=Number(f.amount)||0; return acc; },{in:0,out:0});
+
+  const pct = dayCompletion(day);
+  const rewardEligible = pct>=60;
+
+  document.getElementById('dayPanelContainer').innerHTML = `
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Hari ke-${selectedDay} · Jadwal</div>
+          <div class="panel-sub">${dateStr}</div>
+        </div>
+        ${weekendBadge}
+      </div>
+      ${scheduleRows}
+      <button class="add-row-btn" id="addScheduleBtn">+ tambah kegiatan</button>
+    </div>
+
+    <div class="grid2">
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Tracker Harian</div></div>
+
+        <div class="tracker-item">
+          <label class="tracker-label"><input type="checkbox" id="trkOlahraga" ${day.trackers.olahraga.done?'checked':''}><span class="ico">🏃</span> Olahraga hari ini</label>
+        </div>
+
+        <div class="tracker-item">
+          <label class="tracker-label"><input type="checkbox" id="trkVocabPagi" ${day.trackers.vocabPagi.done?'checked':''}><span class="ico">📖</span> Vocab pagi</label>
+          <div class="row-inline"><input class="num-input" id="trkVocabPagiJumlah" type="number" value="${day.trackers.vocabPagi.jumlah}"><span style="font-size:12px;color:var(--mauve-dim);">kata baru</span></div>
+        </div>
+
+        <div class="tracker-item">
+          <label class="tracker-label"><input type="checkbox" id="trkVocabMalam" ${day.trackers.vocabMalam.done?'checked':''}><span class="ico">🌙</span> Vocab malam</label>
+          <div class="row-inline"><input class="num-input" id="trkVocabMalamJumlah" type="number" value="${day.trackers.vocabMalam.jumlah}"><span style="font-size:12px;color:var(--mauve-dim);">kata direview</span></div>
+        </div>
+
+        <div class="tracker-item">
+          <label class="tracker-label"><span class="ico">📝</span> Latihan soal OTK</label>
+          <div class="row-inline"><input class="num-input" id="trkSoalJumlah" type="number" value="${day.trackers.latihanSoal.jumlah}"><span style="font-size:12px;color:var(--mauve-dim);">soal dikerjakan</span></div>
+          <textarea id="trkSoalCatatan" placeholder="Catatan topik / kesulitan...">${day.trackers.latihanSoal.catatan}</textarea>
+        </div>
+
+        <div class="tracker-item">
+          <label class="tracker-label"><input type="checkbox" id="trkFreelance" ${day.trackers.freelance.done?'checked':''}><span class="ico">💼</span> Freelance / konten SRIBYTE</label>
+          <textarea id="trkFreelanceCatatan" placeholder="Apa yang dikerjakan hari ini...">${day.trackers.freelance.catatan}</textarea>
+        </div>
+
+        <div class="reward-box ${rewardEligible?'eligible':''}">
+          ${rewardEligible ? '🎬 Reward film tersedia malam ini — checklist hari ini sudah cukup terpenuhi.' : '🎬 Reward film belum eligible — selesaikan lebih banyak checklist dulu.'}
+          <label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:12.5px;">
+            <input type="checkbox" id="trkFilmReward" ${day.trackers.filmReward.taken?'checked':''}> Reward film diambil hari ini
+          </label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div class="panel-title">Keuangan Hari Ini</div></div>
+        ${financeRows || '<div style="font-size:12.5px;color:var(--mauve-dim);">Belum ada catatan.</div>'}
+        <button class="add-row-btn" id="addFinanceBtn">+ tambah catatan</button>
+        <div class="fin-total">
+          <span>Masuk: <span class="pos">${fmtRupiah(finTotals.in)}</span></span>
+          <span>Keluar: <span class="neg">${fmtRupiah(finTotals.out)}</span></span>
+          <span>Bersih: ${fmtRupiah(finTotals.in-finTotals.out)}</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  attachDayPanelEvents();
+}
+
+function attachDayPanelEvents(){
+  const day = data.days[selectedDay-1];
+  const container = document.getElementById('dayPanelContainer');
+
+  container.querySelectorAll('.schedule-row').forEach(row=>{
+    const id = row.dataset.id;
+    const item = day.schedule.find(s=>s.id===id);
+    row.querySelector('[data-field="time"]').addEventListener('input', e=>{ item.time=e.target.value; scheduleSave(); refreshLightweight(); });
+    row.querySelector('[data-field="act"]').addEventListener('input', e=>{ item.act=e.target.value; scheduleSave(); });
+    row.querySelector('[data-field="done"]').addEventListener('change', e=>{ item.done=e.target.checked; scheduleSave(); refreshLightweight(); });
+    row.querySelector('[data-action="del-schedule"]').addEventListener('click', ()=>{
+      day.schedule = day.schedule.filter(s=>s.id!==id);
+      scheduleSave(); renderDayPanel(); renderDayGrid();
+    });
+  });
+
+  document.getElementById('addScheduleBtn').addEventListener('click', ()=>{
+    day.schedule.push({id:'s'+Date.now(), time:'00:00', act:'', done:false});
+    scheduleSave(); renderDayPanel();
+  });
+
+  document.getElementById('trkOlahraga').addEventListener('change', e=>{ day.trackers.olahraga.done=e.target.checked; scheduleSave(); refreshLightweight(); });
+  document.getElementById('trkVocabPagi').addEventListener('change', e=>{ day.trackers.vocabPagi.done=e.target.checked; scheduleSave(); refreshLightweight(); });
+  document.getElementById('trkVocabPagiJumlah').addEventListener('input', e=>{ day.trackers.vocabPagi.jumlah=Number(e.target.value)||0; scheduleSave(); });
+  document.getElementById('trkVocabMalam').addEventListener('change', e=>{ day.trackers.vocabMalam.done=e.target.checked; scheduleSave(); refreshLightweight(); });
+  document.getElementById('trkVocabMalamJumlah').addEventListener('input', e=>{ day.trackers.vocabMalam.jumlah=Number(e.target.value)||0; scheduleSave(); });
+  document.getElementById('trkSoalJumlah').addEventListener('input', e=>{ day.trackers.latihanSoal.jumlah=Number(e.target.value)||0; scheduleSave(); refreshLightweight(); });
+  document.getElementById('trkSoalCatatan').addEventListener('input', e=>{ day.trackers.latihanSoal.catatan=e.target.value; scheduleSave(); });
+  document.getElementById('trkFreelance').addEventListener('change', e=>{ day.trackers.freelance.done=e.target.checked; scheduleSave(); refreshLightweight(); });
+  document.getElementById('trkFreelanceCatatan').addEventListener('input', e=>{ day.trackers.freelance.catatan=e.target.value; scheduleSave(); });
+  document.getElementById('trkFilmReward').addEventListener('change', e=>{ day.trackers.filmReward.taken=e.target.checked; scheduleSave(); });
+
+  container.querySelectorAll('.fin-row').forEach(row=>{
+    const idx = Number(row.dataset.idx);
+    row.querySelector('[data-field="desc"]').addEventListener('input', e=>{ day.finance[idx].desc=e.target.value; scheduleSave(); });
+    row.querySelector('[data-field="type"]').addEventListener('change', e=>{ day.finance[idx].type=e.target.value; scheduleSave(); renderDayPanel(); });
+    row.querySelector('[data-field="amount"]').addEventListener('input', e=>{ day.finance[idx].amount=Number(e.target.value)||0; scheduleSave(); renderFinanceTotalsOnly(); });
+    row.querySelector('[data-action="del-finance"]').addEventListener('click', ()=>{
+      day.finance.splice(idx,1); scheduleSave(); renderDayPanel(); renderStats();
+    });
+  });
+
+  document.getElementById('addFinanceBtn').addEventListener('click', ()=>{
+    day.finance.push({desc:'', type:'in', amount:0});
+    scheduleSave(); renderDayPanel();
+  });
+}
+
+function renderFinanceTotalsOnly(){
+  renderStats();
+}
+
+function refreshLightweight(){
+  renderDayGrid();
+  renderStats();
+}
+
+function bindStaticEvents(){
+  document.getElementById('weekTabs').addEventListener('click', e=>{
+    const wk = e.target.closest('.week-tab');
+    if(!wk) return;
+    const week = Number(wk.dataset.week);
+    selectedDay = (week-1)*7+1;
+    renderAll();
+  });
+  document.getElementById('dayGrid').addEventListener('click', e=>{
+    const dot = e.target.closest('.day-dot');
+    if(!dot) return;
+    selectedDay = Number(dot.dataset.day);
+    renderAll();
+  });
+  document.getElementById('resetLink').addEventListener('click', async ()=>{
+    if(confirm('Yakin mau reset semua data 21 hari? Ini nggak bisa dibatalkan.')){
+      data = initData();
+      selectedDay = 1;
+      await persist();
+      renderAll();
+    }
+  });
+}
+
+function renderAll(){
+  renderStats();
+  renderWeekTabs();
+  renderDayGrid();
+  renderDayPanel();
+}
+
+async function boot(){
+  await loadData();
+  bindStaticEvents();
+  renderAll();
+}
+boot();
+</script>
+</body>
+</html>
